@@ -1,0 +1,178 @@
+<div class="booking-page">
+  <div class="page-header">
+    <h1 class="page-title">Đặt sân</h1>
+    <p class="page-subtitle">Chọn sân và thời gian để đặt sân bóng</p>
+  </div>
+
+  <div class="booking-container">
+    <div class="booking-form">
+      <!-- Step 1: Select Date -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <span class="step-number">1</span>
+          Chọn ngày
+        </h2>
+        <div class="date-picker">
+          <input 
+            type="date" 
+            [(ngModel)]="selectedDate" 
+            class="form-control" 
+            [min]="selectedDate"
+          />
+        </div>
+      </div>
+
+      <!-- Step 2: Select Pitch -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <span class="step-number">2</span>
+          Chọn sân
+        </h2>
+        <div class="pitch-selection">
+          @for (pitch of pitches; track pitch.id) {
+            <div 
+              [class]="'pitch-option ' + (selectedPitch?.id === pitch.id ? 'selected' : '')"
+              (click)="selectPitch(pitch)"
+            >
+              <div class="pitch-info">
+                <h3>{{ pitch.name }}</h3>
+                <span class="pitch-type-badge">{{ pitch.type }}</span>
+              </div>
+              <div class="pitch-price">{{ formatCurrency(pitch.price) }}/giờ</div>
+              @if (selectedPitch?.id === pitch.id) {
+                <div class="selected-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Step 3: Select Time Slot -->
+      @if (selectedPitch) {
+        <div class="form-section">
+          <h2 class="section-title">
+            <span class="step-number">3</span>
+            Chọn giờ
+          </h2>
+          <div class="timeslot-grid">
+            @for (slot of timeSlots; track slot.time) {
+              <div 
+                [class]="'timeslot-option ' + 
+                  (slot.available ? '' : 'disabled ') +
+                  (selectedTimeSlot === slot.time ? 'selected' : '')"
+                (click)="selectTimeSlot(slot)"
+              >
+                <div class="timeslot-time">{{ slot.time }}</div>
+                <div class="timeslot-price">{{ formatCurrency(slot.price) }}</div>
+                @if (!slot.available) {
+                  <div class="unavailable-badge">Đã đặt</div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Step 4: Customer Information -->
+      @if (selectedTimeSlot) {
+        <div class="form-section">
+          <h2 class="section-title">
+            <span class="step-number">4</span>
+            Thông tin khách hàng
+          </h2>
+          <div class="customer-form">
+            <div class="form-group">
+              <label>Họ và tên *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="customerName" 
+                class="form-control" 
+                placeholder="Nhập họ và tên"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Số điện thoại *</label>
+                <input 
+                  type="tel" 
+                  [(ngModel)]="customerPhone" 
+                  class="form-control" 
+                  placeholder="0987654321"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input 
+                  type="email" 
+                  [(ngModel)]="customerEmail" 
+                  class="form-control" 
+                  placeholder="email@example.com"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <textarea 
+                [(ngModel)]="notes" 
+                class="form-control" 
+                rows="3" 
+                placeholder="Nhập ghi chú (nếu có)"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Booking Summary -->
+    <div class="booking-summary">
+      <h2 class="summary-title">Thông tin đặt sân</h2>
+      <div class="summary-content">
+        @if (!selectedPitch) {
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 2v4"/>
+              <path d="M8 2v4"/>
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <path d="M3 10h18"/>
+            </svg>
+            <p>Chưa có thông tin đặt sân</p>
+          </div>
+        } @else {
+          <div class="summary-details">
+            <div class="summary-item">
+              <span class="label">Ngày:</span>
+              <span class="value">{{ selectedDate }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Sân:</span>
+              <span class="value">{{ selectedPitch.name }} - {{ selectedPitch.type }}</span>
+            </div>
+            @if (selectedTimeSlot) {
+              <div class="summary-item">
+                <span class="label">Giờ:</span>
+                <span class="value">{{ selectedTimeSlot }}</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-total">
+                <span class="label">Tổng tiền:</span>
+                <span class="value">{{ formatCurrency(getTotalPrice()) }}</span>
+              </div>
+            }
+          </div>
+          @if (selectedTimeSlot && canSubmit()) {
+            <button class="btn btn-primary btn-block" (click)="submitBooking()">
+              Xác nhận đặt sân
+            </button>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

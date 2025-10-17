@@ -1,0 +1,225 @@
+<app-user-header />
+
+<div class="booking-page">
+  <div class="container">
+    <!-- Progress Steps -->
+    <div class="steps-indicator">
+      <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Chọn sân</div>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+        <div class="step-number">2</div>
+        <div class="step-label">Thời gian</div>
+      </div>
+      <div class="step-line" [class.active]="currentStep > 2"></div>
+      <div class="step" [class.active]="currentStep >= 3">
+        <div class="step-number">3</div>
+        <div class="step-label">Thông tin</div>
+      </div>
+    </div>
+
+    <div class="booking-content">
+      <!-- Step 1: Select Pitch -->
+      @if (currentStep === 1) {
+        <div class="step-content">
+          <h2 class="step-title">Chọn sân bóng</h2>
+          <div class="pitches-grid">
+            @for (pitch of pitches; track pitch.id) {
+              <div 
+                class="pitch-card" 
+                [class.selected]="bookingData.pitchId === pitch.id"
+                (click)="selectPitch(pitch.id)"
+              >
+                <div class="pitch-image">
+                  <img [src]="pitch.image" [alt]="pitch.name">
+                  <div class="status-badge">{{ pitch.status === 'available' ? 'Còn trống' : 'Đã đặt' }}</div>
+                </div>
+                <div class="pitch-info">
+                  <h3>{{ pitch.name }}</h3>
+                  <p class="pitch-type">{{ pitch.type }}</p>
+                  <div class="pitch-price">{{ pitch.price | number }}đ<span>/giờ</span></div>
+                </div>
+                @if (bookingData.pitchId === pitch.id) {
+                  <div class="selected-check">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <div class="step-actions">
+            <button class="btn-next" (click)="nextStep()" [disabled]="!bookingData.pitchId">
+              Tiếp theo
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Step 2: Select Date & Time -->
+      @if (currentStep === 2) {
+        <div class="step-content">
+          <h2 class="step-title">Chọn thời gian</h2>
+          
+          <div class="form-section">
+            <div class="form-group">
+              <label>Ngày đặt sân</label>
+              <input 
+                type="date" 
+                [(ngModel)]="bookingData.date" 
+                [min]="getTodayDate()"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Khung giờ</label>
+              <div class="time-slots-grid">
+                @for (slot of timeSlots; track slot) {
+                  <div 
+                    class="time-slot-card" 
+                    [class.selected]="bookingData.timeSlot === slot"
+                    (click)="bookingData.timeSlot = slot"
+                  >
+                    <div class="time">{{ slot }}</div>
+                    <div class="status">Còn trống</div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Thời lượng (giờ)</label>
+              <select [(ngModel)]="bookingData.duration" class="form-control">
+                <option [value]="1.5">1.5 giờ</option>
+                <option [value]="2">2 giờ</option>
+                <option [value]="3">3 giờ</option>
+                <option [value]="4">4 giờ</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn-back" (click)="prevStep()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Quay lại
+            </button>
+            <button class="btn-next" (click)="nextStep()" [disabled]="!bookingData.date || !bookingData.timeSlot">
+              Tiếp theo
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Step 3: Customer Info -->
+      @if (currentStep === 3) {
+        <div class="step-content">
+          <h2 class="step-title">Thông tin liên hệ</h2>
+          
+          <div class="booking-summary">
+            <h3>Thông tin đặt sân</h3>
+            @if (selectedPitch) {
+              <div class="summary-item">
+                <span>Sân:</span>
+                <strong>{{ selectedPitch.name }} - {{ selectedPitch.type }}</strong>
+              </div>
+            }
+            <div class="summary-item">
+              <span>Ngày:</span>
+              <strong>{{ bookingData.date }}</strong>
+            </div>
+            <div class="summary-item">
+              <span>Giờ:</span>
+              <strong>{{ bookingData.timeSlot }}</strong>
+            </div>
+            <div class="summary-item">
+              <span>Thời lượng:</span>
+              <strong>{{ bookingData.duration }} giờ</strong>
+            </div>
+            <div class="divider"></div>
+            <div class="summary-item total">
+              <span>Tổng tiền:</span>
+              <strong>{{ getTotalPrice() | number }}đ</strong>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-group">
+              <label>Họ và tên *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="bookingData.customerName" 
+                placeholder="Nguyễn Văn A"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Số điện thoại *</label>
+              <input 
+                type="tel" 
+                [(ngModel)]="bookingData.phone" 
+                placeholder="0987654321"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input 
+                type="email" 
+                [(ngModel)]="bookingData.email" 
+                placeholder="example@email.com"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Ghi chú</label>
+              <textarea 
+                [(ngModel)]="bookingData.note" 
+                placeholder="Ghi chú thêm (nếu có)..."
+                class="form-control"
+                rows="4"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn-back" (click)="prevStep()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Quay lại
+            </button>
+            <button 
+              class="btn-submit" 
+              (click)="submitBooking()"
+              [disabled]="!bookingData.customerName || !bookingData.phone"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Xác nhận đặt sân
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<app-user-footer />

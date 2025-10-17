@@ -1,0 +1,180 @@
+<app-user-header />
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1 class="hero-title">Sân Bóng Đá Mini Chất Lượng Cao</h1>
+    <p class="hero-subtitle">Đặt sân nhanh chóng, tiện lợi - Trải nghiệm đẳng cấp</p>
+    <div class="hero-actions">
+      <a routerLink="/pitches" class="btn-hero-primary">
+        Đặt sân ngay
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+      <a routerLink="/pitches" class="btn-hero-secondary">
+        Xem danh sách sân
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Khách hàng</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Sân bóng</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">4.8★</div>
+        <div class="stat-label">Đánh giá</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Tại sao chọn chúng tôi?</h2>
+      <p class="section-subtitle">Những lý do khiến khách hàng tin tưởng và lựa chọn</p>
+    </div>
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <div class="feature-card">
+          <div class="feature-icon">
+            @switch (feature.icon) {
+              @case ('clock') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              }
+              @case ('shield') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              }
+              @case ('dollar') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              }
+              @case ('users') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              }
+            }
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Featured Pitches -->
+<section class="featured-pitches">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Sân nổi bật</h2>
+      <p class="section-subtitle">Các sân được ưa chuộng nhất</p>
+    </div>
+    <div class="pitches-grid">
+      @for (pitch of featuredPitches; track pitch.id) {
+        <div class="pitch-card">
+          <div class="pitch-image">
+            <img [src]="pitch.image" [alt]="pitch.name" />
+            <div class="pitch-badge">{{ pitch.type }}</div>
+          </div>
+          <div class="pitch-content">
+            <h3 class="pitch-name">{{ pitch.name }}</h3>
+            <div class="pitch-rating">
+              @for (star of getStars(pitch.rating); track $index) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              }
+              <span class="rating-text">{{ pitch.rating }} ({{ pitch.reviews }} đánh giá)</span>
+            </div>
+            <div class="pitch-footer">
+              <div class="pitch-price">
+                <span class="price-label">Từ</span>
+                <span class="price-value">{{ formatCurrency(pitch.price) }}/h</span>
+              </div>
+              <a [routerLink]="['/user/pitch', pitch.id]" class="btn-book">Đặt sân</a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+    <div class="text-center" style="margin-top: 40px;">
+      <a routerLink="/pitches" class="btn-view-all">
+        Xem tất cả sân
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Khách hàng nói gì về chúng tôi</h2>
+      <p class="section-subtitle">Những phản hồi chân thực từ khách hàng</p>
+    </div>
+    <div class="testimonials-grid">
+      @for (testimonial of testimonials; track testimonial.name) {
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar">{{ testimonial.avatar }}</div>
+            <div class="testimonial-info">
+              <h4 class="testimonial-name">{{ testimonial.name }}</h4>
+              <div class="testimonial-rating">
+                @for (star of getStars(testimonial.rating); track $index) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                }
+              </div>
+            </div>
+          </div>
+          <p class="testimonial-comment">{{ testimonial.comment }}</p>
+          <div class="testimonial-date">{{ testimonial.date }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-content">
+      <h2 class="cta-title">Sẵn sàng trải nghiệm?</h2>
+      <p class="cta-subtitle">Đặt sân ngay hôm nay để nhận ưu đãi đặc biệt</p>
+      <a routerLink="/pitches" class="btn-cta">
+        Đặt sân ngay
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<app-user-footer />

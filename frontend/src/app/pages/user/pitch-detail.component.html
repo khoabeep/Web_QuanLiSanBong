@@ -1,0 +1,181 @@
+<app-user-header />
+
+<div class="pitch-detail-page">
+  @if (pitch) {
+    <div class="container">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a routerLink="/home">Trang chủ</a>
+        <span>/</span>
+        <a routerLink="/pitches">Danh sách sân</a>
+        <span>/</span>
+        <span>{{ pitch.name }}</span>
+      </nav>
+
+      <!-- Gallery -->
+      <div class="gallery-section">
+        <div class="main-image">
+          <img [src]="galleryImages[selectedImage]" [alt]="pitch.name">
+          <span class="status-badge" [class.booked]="pitch.status === 'occupied'">
+            {{ pitch.status === 'available' ? 'Còn trống' : 'Đã đặt' }}
+          </span>
+        </div>
+        <div class="thumbnail-images">
+          @for (img of galleryImages; track img; let i = $index) {
+            <div 
+              class="thumbnail" 
+              [class.active]="selectedImage === i"
+              (click)="selectImage(i)"
+            >
+              <img [src]="img" [alt]="'Ảnh ' + (i + 1)">
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Info Section -->
+      <div class="info-section">
+        <div class="info-main">
+          <div class="pitch-header">
+            <div>
+              <h1>{{ pitch.name }}</h1>
+              <div class="pitch-meta">
+                <span class="type-tag">{{ pitch.type }}</span>
+                <span class="rating">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  4.8 (125 đánh giá)
+                </span>
+              </div>
+            </div>
+            <div class="price-box">
+              <div class="price">{{ pitch.price | number }}đ</div>
+              <div class="price-unit">/giờ</div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="section-box">
+            <h2>Mô tả</h2>
+            <p>
+              {{ pitch.name }} là một trong những sân bóng đá mini chất lượng cao nhất khu vực. 
+              Với bề mặt sân được phủ cỏ nhân tạo cao cấp, hệ thống đèn chiếu sáng hiện đại, 
+              đảm bảo trải nghiệm tốt nhất cho các trận đấu của bạn.
+            </p>
+            <p>
+              Sân được thiết kế theo tiêu chuẩn quốc tế với kích thước chuẩn, 
+              phù hợp cho các trận đấu giao hữu, tập luyện hay giải đấu nghiệp dư.
+            </p>
+          </div>
+
+          <!-- Facilities -->
+          <div class="section-box">
+            <h2>Tiện ích</h2>
+            <div class="facilities-grid">
+              @for (facility of pitch.facilities; track facility) {
+                <div class="facility-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>{{ facility }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Time Slots -->
+          <div class="section-box">
+            <h2>Khung giờ trong ngày</h2>
+            <div class="time-slots-grid">
+              @for (slot of timeSlots; track slot.time) {
+                <div class="time-slot" [class.unavailable]="!slot.available">
+                  <div class="time">{{ slot.time }}</div>
+                  <div class="status">{{ slot.available ? 'Còn trống' : 'Đã đặt' }}</div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Rules -->
+          <div class="section-box">
+            <h2>Quy định</h2>
+            <ul class="rules-list">
+              <li>Có mặt trước giờ đặt sân 10 phút</li>
+              <li>Không mang đồ ăn, thức uống có cồn vào sân</li>
+              <li>Giữ gìn vệ sinh sân bãi</li>
+              <li>Không gây gổ, đánh nhau</li>
+              <li>Hoàn tiền 100% nếu hủy trước 24h</li>
+              <li>Chỉ hoàn 50% nếu hủy trong vòng 24h</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Booking Card -->
+        <div class="booking-card">
+          <div class="booking-header">
+            <h3>Đặt sân ngay</h3>
+            <div class="price-highlight">{{ pitch.price | number }}đ<span>/giờ</span></div>
+          </div>
+
+          <div class="booking-form">
+            <div class="form-group">
+              <label>Ngày đặt sân</label>
+              <input type="date" class="form-control" [min]="getCurrentDate()">
+            </div>
+
+            <div class="form-group">
+              <label>Khung giờ</label>
+              <select class="form-control">
+                <option value="">Chọn khung giờ</option>
+                @for (slot of timeSlots; track slot.time) {
+                  @if (slot.available) {
+                    <option [value]="slot.time">{{ slot.time }}</option>
+                  }
+                }
+              </select>
+            </div>
+
+            <div class="booking-info">
+              <div class="info-row">
+                <span>Giá thuê sân:</span>
+                <strong>{{ pitch.price | number }}đ</strong>
+              </div>
+              <div class="info-row">
+                <span>Phí dịch vụ:</span>
+                <strong>20.000đ</strong>
+              </div>
+              <div class="divider"></div>
+              <div class="info-row total">
+                <span>Tổng cộng:</span>
+                <strong>{{ pitch.price + 20000 | number }}đ</strong>
+              </div>
+            </div>
+
+            <button class="btn-book-now" (click)="bookNow()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Đặt sân ngay
+            </button>
+
+            <div class="contact-info">
+              <p>Cần hỗ trợ?</p>
+              <a href="tel:0987654321" class="contact-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                0987.654.321
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<app-user-footer />
