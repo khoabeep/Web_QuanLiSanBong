@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, PLATFORM_ID, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 import { User, LoginRequest, RegisterRequest } from '../models/user.model';
 
 @Injectable({
@@ -8,25 +9,29 @@ import { User, LoginRequest, RegisterRequest } from '../models/user.model';
 export class AuthService {
   currentUser = signal<User | null>(null);
   isLoggedIn = signal<boolean>(false);
+  private platformId = inject(PLATFORM_ID);
 
   constructor(private router: Router) {
-    // Kiểm tra localStorage khi khởi động
+    // Kiểm tra localStorage khi khởi động (chỉ ở browser)
     this.loadUserFromStorage();
   }
 
   private loadUserFromStorage() {
-    // Tạm thời không load từ localStorage để demo giao diện
-    // const userJson = localStorage.getItem('currentUser');
-    // if (userJson) {
-    //   const user = JSON.parse(userJson);
-    //   this.currentUser.set(user);
-    //   this.isLoggedIn.set(true);
-    // }
-    
-    // Đảm bảo user chưa đăng nhập khi mở trang
-    this.currentUser.set(null);
-    this.isLoggedIn.set(false);
-    localStorage.removeItem('currentUser');
+    // Chỉ chạy ở browser, không chạy ở server (SSR)
+    if (isPlatformBrowser(this.platformId)) {
+      // Tạm thời không load từ localStorage để demo giao diện
+      // const userJson = localStorage.getItem('currentUser');
+      // if (userJson) {
+      //   const user = JSON.parse(userJson);
+      //   this.currentUser.set(user);
+      //   this.isLoggedIn.set(true);
+      // }
+      
+      // Đảm bảo user chưa đăng nhập khi mở trang
+      this.currentUser.set(null);
+      this.isLoggedIn.set(false);
+      localStorage.removeItem('currentUser');
+    }
   }
 
   login(request: LoginRequest): Promise<boolean> {
@@ -45,7 +50,9 @@ export class AuthService {
 
         this.currentUser.set(mockUser);
         this.isLoggedIn.set(true);
-        localStorage.setItem('currentUser', JSON.stringify(mockUser));
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('currentUser', JSON.stringify(mockUser));
+        }
         resolve(true);
       }, 500);
     });
@@ -67,7 +74,9 @@ export class AuthService {
 
         this.currentUser.set(mockUser);
         this.isLoggedIn.set(true);
-        localStorage.setItem('currentUser', JSON.stringify(mockUser));
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('currentUser', JSON.stringify(mockUser));
+        }
         resolve(true);
       }, 500);
     });
@@ -76,7 +85,9 @@ export class AuthService {
   logout() {
     this.currentUser.set(null);
     this.isLoggedIn.set(false);
-    localStorage.removeItem('currentUser');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('currentUser');
+    }
     this.router.navigate(['/home']);
   }
 

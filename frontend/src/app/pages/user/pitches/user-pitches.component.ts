@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { UserHeaderComponent } from '../../components/user/user-header.component';
-import { UserFooterComponent } from '../../components/user/user-footer.component';
-import { Pitch } from '../../models/pitch.model';
+import { UserHeaderComponent } from '../../../components/user/user-header.component';
+import { UserFooterComponent } from '../../../components/user/user-footer.component';
+import { Pitch } from '../../../models/pitch.model';
 
 @Component({
   selector: 'app-user-pitches',

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { UserHeaderComponent } from '../../components/user/user-header.component';
-import { UserFooterComponent } from '../../components/user/user-footer.component';
+import { UserHeaderComponent } from '../../../components/user/user-header.component';
+import { UserFooterComponent } from '../../../components/user/user-footer.component';
 
 @Component({
   selector: 'app-home',
